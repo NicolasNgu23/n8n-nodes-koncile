@@ -3,7 +3,12 @@
   "version": "0.1.0",
   "displayName": "Koncile Nodes",
   "description": "Nodes n8n to upload file on Koncile",
-  "keywords": ["n8n", "koncile", "automation", "api"],
+  "keywords": [
+    "n8n",
+    "koncile",
+    "automation",
+    "api"
+  ],
   "license": "MIT",
   "homepage": "",
   "author": {
@@ -21,6 +26,7 @@
   "scripts": {
     "build": "npx rimraf dist && tsc && gulp build:icons",
     "dev": "tsc --watch",
+    "test": "jest",
     "format": "prettier nodes credentials --write",
     "lint": "eslint nodes credentials package.json",
     "lintfix": "eslint nodes credentials package.json --fix",
@@ -41,11 +47,14 @@
     ]
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@typescript-eslint/parser": "~8.32.0",
     "eslint": "^8.57.0",
     "eslint-plugin-n8n-nodes-base": "^1.16.3",
     "gulp": "^5.0.0",
+    "jest": "^30.0.3",
     "prettier": "^3.5.3",
+    "ts-jest": "^29.4.0",
     "typescript": "^5.8.2"
   },
   "peerDependencies": {
