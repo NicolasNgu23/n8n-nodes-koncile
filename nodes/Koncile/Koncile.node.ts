@@ -126,9 +126,9 @@ export class Koncile implements INodeType {
 		const apiKey = credentials.api_key;
 
 		for (let i = 0; i < items.length; i++) {
-			const binaryPropertyName = this.getNodeParameter('binaryPropertyName', i) as string;
-			const template_id = this.getNodeParameter('template_id', i) as number;
-			const folder_id = this.getNodeParameter('folder_id', i) as number;
+			const binaryPropertyName = this.getNodeParameter('binaryPropertyName', i)
+			const template_id = this.getNodeParameter('template_id', i)
+			const folder_id = this.getNodeParameter('folder_id', i);
 
 			const item = items[i];
 			const binaryData = item.binary?.[binaryPropertyName];
@@ -164,7 +164,7 @@ export class Koncile implements INodeType {
 						maxBodyLength: Infinity,
 					}
 				);
-        console.log('📦 Réponse de Koncile Upload API :\n', JSON.stringify(response.data, null, 2));
+
 				returnData.push({
 					json: {
 						...response.data,

@@ -38,7 +38,6 @@ describe('Koncile Upload API - Real file from URL', () => {
 				}
 			);
 
-			console.log('📦 Response from Koncile:', JSON.stringify(response.data, null, 2));
 
 			expect(response.status).toBe(200);
 		},
