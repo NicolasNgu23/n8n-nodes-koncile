@@ -1,15 +1,14 @@
 {
-  "name": "n8n-nodes-<...>",
+  "name": "@koncile/n8n-nodes",
   "version": "0.1.0",
-  "description": "",
-  "keywords": [
-    "n8n-community-node-package"
-  ],
+  "displayName": "Koncile Nodes",
+  "description": "Nodes n8n to upload file on Koncile",
+  "keywords": ["n8n", "koncile", "automation", "api"],
   "license": "MIT",
   "homepage": "",
   "author": {
-    "name": "",
-    "email": ""
+    "name": "Nicolas Nguyen",
+    "email": "Tristan@koncile.ai"
   },
   "repository": {
     "type": "git",
