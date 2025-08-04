@@ -11,15 +11,11 @@ import {
 	NodeConnectionType,
 } from 'n8n-workflow';
 
-
-import axios from 'axios';
-import FormData from 'form-data';
-
 export class Koncile implements INodeType {
 	description: INodeTypeDescription = {
 		displayName: 'Koncile',
 		name: 'koncile',
-    icon: 'file:koncile.svg',
+		icon: 'file:koncile.svg',
 		group: ['transform'],
 		version: 1,
 		description: 'Send files to Koncile.ai',
@@ -58,7 +54,7 @@ export class Koncile implements INodeType {
 				displayName: 'Template Name or ID',
 				name: 'template_id',
 				type: 'options',
-				description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
+		    description: 'Choose from the list, or specify an ID using an <a href="https://docs.n8n.io/code/expressions/">expression</a>',
 				typeOptions: {
 					loadOptionsMethod: 'getTemplates',
 					loadOptionsDependsOn: ['folder_id'],
@@ -70,65 +66,57 @@ export class Koncile implements INodeType {
 	};
 
 	methods = {
-	loadOptions: {
-		async getFolders(this: ILoadOptionsFunctions) {
-			const credentials = await this.getCredentials('koncileApi');
-			const apiKey = credentials.api_key;
+		loadOptions: {
+			async getFolders(this: ILoadOptionsFunctions) {
+				const credentials = await this.getCredentials('koncileApi');
+				const apiKey = credentials.api_key;
 
-    const response = await this.helpers.httpRequest({
-      method: 'GET',
-      url: 'https://api.koncile.ai/v1/fetch_all_folders/',
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-      },
-    });
+				const response = await this.helpers.httpRequest({
+					method: 'GET',
+					url: 'https://api.koncile.ai/v1/fetch_all_folders/',
+					headers: {
+						Authorization: `Bearer ${apiKey}`,
+					},
+				});
 
+				return response.folders.map((folder: any) => ({
+					name: folder.name,
+					value: folder.id,
+				}));
+			},
 
-			return response.folders.map((folder: any) => ({
-				name: folder.name,
-				value: folder.id,
-			}));
+			async getTemplates(this: ILoadOptionsFunctions) {
+				const credentials = await this.getCredentials('koncileApi');
+				const apiKey = credentials.api_key;
+				const folderId = this.getCurrentNodeParameter('folder_id') as number;
+
+				const response = await this.helpers.httpRequest({
+					method: 'GET',
+					url: 'https://api.koncile.ai/v1/fetch_all_folders/',
+					headers: {
+						Authorization: `Bearer ${apiKey}`,
+					},
+				});
+
+				const folder = response.folders.find((f: any) => f.id === folderId);
+				if (!folder?.templates?.length) return [];
+
+				return folder.templates.map((template: any) => ({
+					name: template.name,
+					value: template.id,
+				}));
+			},
 		},
-
-		async getTemplates(this: ILoadOptionsFunctions) {
-			const credentials = await this.getCredentials('koncileApi');
-			const apiKey = credentials.api_key;
-			const folderId = this.getCurrentNodeParameter('folder_id') as number;
-
-      const response = await this.helpers.httpRequest({
-        method: 'GET',
-        url: 'https://api.koncile.ai/v1/fetch_all_folders/',
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-        },
-      });
-
-
-			const folder = response.folders.find((f: any) => f.id === folderId);
-			if (!folder?.templates?.length) {
-				return [];
-			}
-
-			return folder.templates.map((template: any) => ({
-				name: template.name,
-				value: template.id,
-			}));
-		},
-	},
-};
-
+	};
 
 	async execute(this: IExecuteFunctions): Promise<INodeExecutionData[][]> {
 		const items = this.getInputData();
 		const returnData: INodeExecutionData[] = [];
 
-		const credentials = await this.getCredentials('koncileApi');
-		const apiKey = credentials.api_key;
-
 		for (let i = 0; i < items.length; i++) {
-			const binaryPropertyName = this.getNodeParameter('binaryPropertyName', i)
-			const template_id = this.getNodeParameter('template_id', i)
-			const folder_id = this.getNodeParameter('folder_id', i);
+			const binaryPropertyName = this.getNodeParameter('binaryPropertyName', i) as string;
+			const template_id = this.getNodeParameter('template_id', i) as number;
+			const folder_id = this.getNodeParameter('folder_id', i) as number;
 
 			const item = items[i];
 			const binaryData = item.binary?.[binaryPropertyName];
@@ -141,37 +129,38 @@ export class Koncile implements INodeType {
 
 			const fileBuffer = await this.helpers.getBinaryDataBuffer(i, binaryPropertyName);
 
-			const form = new FormData();
-			form.append('files', fileBuffer, {
-				filename: binaryData.fileName || 'upload.pdf',
-				contentType: binaryData.mimeType || 'application/pdf',
-			});
+			const credentials = await this.getCredentials('koncileApi');
+			const apiKey = credentials.api_key;
 
 			try {
-				const response = await axios.post(
-					'https://api.koncile.ai/v1/upload_file/',
-					form,
-					{
-						headers: {
-							...form.getHeaders(),
-							Authorization: `Bearer ${apiKey}`,
+				const response = await this.helpers.httpRequest({
+					method: 'POST',
+					url: 'https://api.koncile.ai/v1/upload_file/',
+					headers: {
+						Authorization: `Bearer ${apiKey}`,
+					},
+					qs: {
+						template_id,
+						folder_id,
+					},
+					formData: {
+						files: {
+							value: fileBuffer,
+							options: {
+								filename: binaryData.fileName || 'upload.pdf',
+								contentType: binaryData.mimeType || 'application/pdf',
+							},
 						},
-						params: {
-							template_id,
-							folder_id,
-						},
-						maxContentLength: Infinity,
-						maxBodyLength: Infinity,
-					}
-				);
+					},
+				} as any);
 
 				returnData.push({
 					json: {
-						...response.data,
+						...response,
 						uploaded_file_name: binaryData.fileName,
 					},
 				});
-			} catch (error: any) {
+			} catch (error) {
 				throw new NodeApiError(this.getNode(), error);
 			}
 		}
