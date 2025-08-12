@@ -1,6 +1,6 @@
 {
   "name": "@koncile/n8n-nodes",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "displayName": "Koncile Nodes",
   "description": "Nodes n8n to upload file on Koncile",
   "keywords": [
