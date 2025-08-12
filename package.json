@@ -11,14 +11,14 @@
     "api"
   ],
   "license": "MIT",
-  "homepage": "",
+  "homepage": "https://github.com/Koncile/n8n-nodes-koncile#readme",
   "author": {
-    "name": "Nicolas Nguyen",
-    "email": "nicolas@koncile.ai"
+    "name": "Koncile Team",
+    "email": "tech@koncile.ai"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/NicolasNgu23/n8n-nodes-koncile.git"
+    "url": "https://github.com/Koncile/n8n-nodes-koncile.git"
   },
   "engines": {
     "node": ">=20.15"
